@@ -12,12 +12,9 @@ import java.util.Optional;
 @Service
 public class CorsoService {
 
-    private final CorsoRepository corsoRepository;
-
     @Autowired
-    public CorsoService(CorsoRepository corsoRepository) {
-        this.corsoRepository = corsoRepository;
-    }
+    private CorsoRepository corsoRepository;
+
 
     @Transactional(readOnly = true)
     public List<Corso> getAllCorsi() {
@@ -57,38 +54,6 @@ public class CorsoService {
         corsoRepository.delete(corso);
     }
 
-//    @Transactional
-//    public Corso aggiungiDiscente(Long corsoId, String nomeDiscente, String cognomeDiscente) {
-//        Corso corso = corsoRepository.findById(corsoId)
-//                .orElseThrow(() -> new RuntimeException("Corso non trovato con id: " + corsoId));
-//
-//        Discente discente = discenteRepository.findByNomeAndCognome(nomeDiscente, cognomeDiscente)
-//                .orElseThrow(() -> new RuntimeException(
-//                        "Discente non trovato: " + nomeDiscente + " " + cognomeDiscente));
-//
-//        if (!corso.getDiscenti().contains(discente)) {
-//            corso.getDiscenti().add(discente);
-//            discente.getCorsi().add(corso);
-//        }
-//
-//        return corsoRepository.save(corso);
-//    }
-
-//    @Transactional
-//    public Corso rimuoviDiscente(Long corsoId, String nomeDiscente, String cognomeDiscente) {
-//        Corso corso = corsoRepository.findById(corsoId)
-//                .orElseThrow(() -> new RuntimeException("Corso non trovato con id: " + corsoId));
-//
-//        Discente discente = discenteRepository.findByNomeAndCognome(nomeDiscente, cognomeDiscente)
-//                .orElseThrow(() -> new RuntimeException(
-//                        "Discente non trovato: " + nomeDiscente + " " + cognomeDiscente));
-//
-//        corso.getDiscenti().remove(discente);
-//        discente.getCorsi().remove(corso);
-//
-//        return corsoRepository.save(corso);
-//    }
-
     @Transactional(readOnly = true)
     public List<Corso> findCorsiByNome(String nome) {
         return corsoRepository.findByNomeContainingIgnoreCase(nome);
@@ -103,15 +68,4 @@ public class CorsoService {
         }
     }
 
-//    @Transactional(readOnly = true)
-//    public List<Discente> getDiscentiCorso(Long corsoId) {
-//        return corsoRepository.findById(corsoId)
-//                .map(Corso::getDiscenti)
-//                .orElseThrow(() -> new RuntimeException("Corso non trovato con id: " + corsoId));
-//    }
-//
-//    @Transactional(readOnly = true)
-//    public Optional<Docente> getDocenteByNomeAndCognome(String nome, String cognome) {
-//        return docenteRepository.findByNomeAndCognome(nome, cognome);
-//    }
 }

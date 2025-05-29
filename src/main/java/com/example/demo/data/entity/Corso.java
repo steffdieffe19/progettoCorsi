@@ -1,6 +1,5 @@
 package com.example.demo.data.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -9,7 +8,6 @@ import jakarta.persistence.*;
 public class Corso {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonIgnore
     private Long id;
 
     @Column(nullable = false)
@@ -17,6 +15,8 @@ public class Corso {
 
     @Column(nullable = false)
     private Integer anno_accademico;
+
+
 
     //COSTRUTTORI
     public Corso() {

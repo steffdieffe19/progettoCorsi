@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.Mapper.CorsoMapper;
 import com.example.demo.data.DTO.CorsoDTO;
 import com.example.demo.data.entity.Corso;
 import com.example.demo.service.CorsoService;
@@ -18,6 +19,9 @@ public class CorsoController {
     private final CorsoService corsoService;
 
     @Autowired
+    private CorsoMapper corsoMapper;
+
+    @Autowired
     public CorsoController(CorsoService corsoService) {
         this.corsoService = corsoService;
     }
@@ -26,21 +30,21 @@ public class CorsoController {
     public List<CorsoDTO> getAllCorsi() {
         return corsoService.getAllCorsi()
                 .stream()
-                .map(this::toDTO)
+                .map(corsoMapper::toDTO)
                 .toList();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<CorsoDTO> getCorsoById(@PathVariable Long id) {
         return corsoService.getCorsoById(id)
-                .map(corso -> ResponseEntity.ok(toDTO(corso)))
+                .map(corso -> ResponseEntity.ok(corsoMapper.toDTO(corso)))
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
     public ResponseEntity<CorsoDTO> createCorso(@RequestBody Corso corso) {
         Corso saved = corsoService.createCorso(corso);
-        return ResponseEntity.ok(toDTO(saved));
+        return ResponseEntity.ok(corsoMapper.toDTO(saved));
     }
 
     @PutMapping("/{id}")
@@ -54,7 +58,7 @@ public class CorsoController {
         corso.setAnno_accademico(updatedCorso.getAnno_accademico());
 
         Corso saved = corsoService.updateCorso(corso);
-        return ResponseEntity.ok(toDTO(saved));
+        return ResponseEntity.ok(corsoMapper.toDTO(saved));
     }
 
     @DeleteMapping("/{id}")
@@ -88,12 +92,4 @@ public class CorsoController {
 //                .toList();
 //        return ResponseEntity.ok(discenti);
 //    }
-
-    private CorsoDTO toDTO(Corso corso) {
-        CorsoDTO dto = new CorsoDTO();
-        dto.setNome(corso.getNome());
-        dto.setAnno_accademico(corso.getAnno_accademico());
-
-        return dto;
-    }
 }

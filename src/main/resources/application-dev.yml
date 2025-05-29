@@ -2,23 +2,16 @@ spring:
   application:
     name: demo
 
-server:
-  port: 8080
-  error:
-    whitelabel:
-      enabled: true
-  servlet:
-    jsp:
-      prefix: /WEB-INF/jsp/error-page
-      suffix: .jsp
+  server:
+    port: 8080
+    error:
+      whitelabel:
+        enabled: true
+    servlet:
+      jsp:
+        prefix: /WEB-INF/jsp/error-page
+        suffix: .jsp
 
-custom:
-  message: "Profilo DEV"
-
-
-  h2:
-    console:
-      enabled: true
 
   datasource:
     url: jdbc:postgresql://localhost:5432/database_corso
@@ -29,9 +22,14 @@ custom:
   jpa:
     hibernate:
       ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
 
-# Endpoints utili:
+custom:
+  message: "Profilo DEV"
+
 # - http://localhost:8080/docenti/lista
 # - http://localhost:8080/discenti/lista
 # - http://localhost:8080/corso/lista
