@@ -3,9 +3,6 @@ package com.example.demo.data.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Entity
 @Table(name = "corso")
 
@@ -21,34 +18,13 @@ public class Corso {
     @Column(nullable = false)
     private Integer anno_accademico;
 
-    @ManyToOne
-    @JoinColumn(name = "id_docente", nullable = false)
-    private Docente docente;
-
-    @ManyToMany
-    @JoinTable(
-            name = "corso_discente",
-            joinColumns = @JoinColumn(name = "id_corso"),
-            inverseJoinColumns = @JoinColumn(name = "id_discente")
-    )
-    private List<Discente> discenti = new ArrayList<>();
-
-    public List<Discente> getDiscenti() {
-        return discenti;
-    }
-
-    public void setDiscenti(List<Discente> discenti) {
-        this.discenti = discenti;
-    }
-
     //COSTRUTTORI
     public Corso() {
     }
 
-    public Corso(String nome, Integer anno_accademico, Docente docente) {
+    public Corso(String nome, Integer anno_accademico) {
         this.nome = nome;
         this.anno_accademico = anno_accademico;
-        this.docente = docente;
     }
 
     public Long getId() {
@@ -75,12 +51,5 @@ public class Corso {
         this.anno_accademico = anno_accademico;
     }
 
-    public Docente getDocente() {
-        return docente;
-    }
-
-    public void setDocente(Docente docente) {
-        this.docente = docente;
-    }
 
 }

@@ -21,7 +21,7 @@ custom:
       enabled: true
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/academy
+    url: jdbc:postgresql://localhost:5432/database_corso
     username: postgres
     password: Tyson1209
     driver-class-name: org.postgresql.Driver
