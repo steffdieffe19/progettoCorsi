@@ -1,10 +1,16 @@
 package com.example.demo.service;
 
+import com.example.demo.ClientFeign.Client;
+import com.example.demo.controller.CorsoController;
+import com.example.demo.data.DTO.CorsoDTO;
 import com.example.demo.data.entity.Corso;
 import com.example.demo.repository.CorsoRepository;
+import feign.FeignException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,6 +21,8 @@ public class CorsoService {
     @Autowired
     private CorsoRepository corsoRepository;
 
+    @Autowired
+    private Client.DocenteClient docenteClient;
 
     @Transactional(readOnly = true)
     public List<Corso> getAllCorsi() {
@@ -27,12 +35,15 @@ public class CorsoService {
     }
 
     @Transactional
-    public Corso createCorso(Corso corso) {
-        validateCorso(corso);
-
-        return corsoRepository.save(corso);
+    public Corso createCorso(CorsoDTO dto ) {
+        try {
+            docenteClient.getDocenteById(dto.getId_docente());
+            Corso corso = new Corso();
+            return corsoRepository.save(corso);
+        } catch (FeignException.NotFound e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Docente non trovato");
+        }
     }
-
     @Transactional
     public Corso updateCorso(Corso corso) {
         Corso existing = corsoRepository.findById(corso.getId())
@@ -42,6 +53,9 @@ public class CorsoService {
 
         existing.setNome(corso.getNome());
         existing.setAnno_accademico(corso.getAnno_accademico());
+        if (corso.getId_docente() != null) {
+            existing.setId_docente(corso.getId_docente());
+        }
 
         return corsoRepository.save(existing);
     }

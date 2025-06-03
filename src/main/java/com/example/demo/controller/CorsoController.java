@@ -5,6 +5,7 @@ import com.example.demo.data.DTO.CorsoDTO;
 import com.example.demo.data.entity.Corso;
 import com.example.demo.service.CorsoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,7 +14,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/corsi")
-@CrossOrigin(origins = "*")
+
 public class CorsoController {
 
     private final CorsoService corsoService;
@@ -42,9 +43,10 @@ public class CorsoController {
     }
 
     @PostMapping
-    public ResponseEntity<CorsoDTO> createCorso(@RequestBody Corso corso) {
-        Corso saved = corsoService.createCorso(corso);
+    public ResponseEntity<CorsoDTO> createCorso(@RequestBody CorsoDTO dto) {
+        Corso saved = corsoService.createCorso(dto);
         return ResponseEntity.ok(corsoMapper.toDTO(saved));
+
     }
 
     @PutMapping("/{id}")
@@ -56,6 +58,9 @@ public class CorsoController {
         Corso corso = existing.get();
         corso.setNome(updatedCorso.getNome());
         corso.setAnno_accademico(updatedCorso.getAnno_accademico());
+       if (updatedCorso.getId_docente() != null) {
+            corso.setId_docente(updatedCorso.getId_docente());
+        }
 
         Corso saved = corsoService.updateCorso(corso);
         return ResponseEntity.ok(corsoMapper.toDTO(saved));
@@ -66,30 +71,4 @@ public class CorsoController {
         corsoService.deleteCorso(id);
         return ResponseEntity.noContent().build();
     }
-
-//    @PostMapping("/{corsoId}/discenti")
-//    public ResponseEntity<CorsoDTO> aggiungiDiscente(
-//            @PathVariable Long corsoId,
-//            @RequestParam String nome,
-//            @RequestParam String cognome) {
-//        Corso corso = corsoService.aggiungiDiscente(corsoId, nome, cognome);
-//        return ResponseEntity.ok(toDTO(corso));
-//    }
-
-//    @DeleteMapping("/{corsoId}/discenti")
-//    public ResponseEntity<CorsoDTO> rimuoviDiscente(
-//            @PathVariable Long corsoId,
-//            @RequestParam String nome,
-//            @RequestParam String cognome) {
-//        Corso corso = corsoService.rimuoviDiscente(corsoId, nome, cognome);
-//        return ResponseEntity.ok(toDTO(corso));
-//    }
-
-//    @GetMapping("/{corsoId}/discenti")
-//    public ResponseEntity<List<DiscenteLiteDTO>> getDiscentiCorso(@PathVariable Long corsoId) {
-//        List<DiscenteLiteDTO> discenti = corsoService.getDiscentiCorso(corsoId).stream()
-//                .map(d -> new DiscenteLiteDTO(d.getNome(), d.getCognome()))
-//                .toList();
-//        return ResponseEntity.ok(discenti);
-//    }
 }
