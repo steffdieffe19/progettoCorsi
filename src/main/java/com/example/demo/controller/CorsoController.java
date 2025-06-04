@@ -28,10 +28,7 @@ public class CorsoController {
 
     @GetMapping
     public List<CorsoDTO> getAllCorsi() {
-        return corsoService.getAllCorsi()
-                .stream()
-                .map(corsoMapper::toDTO)
-                .toList();
+        return corsoService.getAllCorsiDocente();
     }
 
     @GetMapping("/{id}")
@@ -67,29 +64,4 @@ public class CorsoController {
         return ResponseEntity.noContent().build();
     }
 
-//    @PostMapping("/{corsoId}/discenti")
-//    public ResponseEntity<CorsoDTO> aggiungiDiscente(
-//            @PathVariable Long corsoId,
-//            @RequestParam String nome,
-//            @RequestParam String cognome) {
-//        Corso corso = corsoService.aggiungiDiscente(corsoId, nome, cognome);
-//        return ResponseEntity.ok(toDTO(corso));
-//    }
-
-//    @DeleteMapping("/{corsoId}/discenti")
-//    public ResponseEntity<CorsoDTO> rimuoviDiscente(
-//            @PathVariable Long corsoId,
-//            @RequestParam String nome,
-//            @RequestParam String cognome) {
-//        Corso corso = corsoService.rimuoviDiscente(corsoId, nome, cognome);
-//        return ResponseEntity.ok(toDTO(corso));
-//    }
-
-//    @GetMapping("/{corsoId}/discenti")
-//    public ResponseEntity<List<DiscenteLiteDTO>> getDiscentiCorso(@PathVariable Long corsoId) {
-//        List<DiscenteLiteDTO> discenti = corsoService.getDiscentiCorso(corsoId).stream()
-//                .map(d -> new DiscenteLiteDTO(d.getNome(), d.getCognome()))
-//                .toList();
-//        return ResponseEntity.ok(discenti);
-//    }
 }
