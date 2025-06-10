@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import com.example.demo.Mapper.CorsoMapper;
 import com.example.demo.data.DTO.CorsoDTO;
+import com.example.demo.data.DTO.DiscenteDTO;
 import com.example.demo.data.DTO.DocenteDTO;
 import com.example.demo.data.entity.Corso;
 import com.example.demo.repository.CorsoRepository;
@@ -31,7 +32,7 @@ public class CorsoService {
     }
 
     @Transactional(readOnly = true)
-    public List<CorsoDTO> getAllCorsiDocente() {
+    public List<CorsoDTO> getAllCorsi() {
         List<Corso> corsi = corsoRepository.findAll();
         List<CorsoDTO> corsiDTO = new ArrayList<>();
 
@@ -59,6 +60,21 @@ public class CorsoService {
                 dto.setDocenteCognome("Non trovato");
             }
 
+            try {
+                DiscenteDTO discente = webClient.get()
+                        .uri("/api/discenti/{id}", corso.getId_dicente())
+                        .retrieve()
+                        .bodyToMono(DiscenteDTO.class)
+                        .block();
+                if (discente != null) {
+                    dto.setId_dicente(discente.getId());}
+                    dto.setDiscenteNome(discente.getNome());
+                    dto.setDiscenteCognome(discente.getCognome());
+            } catch (WebClientResponseException.NotFound e) {
+                dto.setDiscenteNome("Non trovato");
+                dto.setDiscenteCognome("Non trovato");
+            }
+
             corsiDTO.add(dto);
         }
 
@@ -66,8 +82,21 @@ public class CorsoService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<Corso> getCorsoById(Long id) {
-        return corsoRepository.findById(id);
+    public List<DiscenteDTO> getDiscentiByCorso(Long corsoId) {
+        try {
+            return webClient.get()
+                    .uri("/api/corsi/{id}/discenti", corsoId)
+                    .retrieve()
+                    .bodyToFlux(DiscenteDTO.class)
+                    .collectList()
+                    .block();
+        } catch (WebClientResponseException.NotFound e) {
+            logger.warn("Nessun discente trovato per il corso ID: {}", corsoId);
+            return new ArrayList<>();
+        } catch (Exception e) {
+            logger.error("Errore durante il recupero dei discenti per il corso ID: {}", corsoId, e);
+            throw new RuntimeException("Impossibile recuperare i discenti del corso", e);
+        }
     }
 
 
@@ -117,16 +146,20 @@ public class CorsoService {
     }
 
     @Transactional
-    public Corso updateCorso(Corso corso) {
-        Corso existing = corsoRepository.findById(corso.getId())
-                .orElseThrow(() -> new RuntimeException("Corso non trovato con id: " + corso.getId()));
+    public CorsoDTO updateCorso(Long id, CorsoDTO updatedCorso) {
+        Optional<Corso> corso = corsoRepository.findById(id);
+        if (!corso.isPresent()) {
+            throw new RuntimeException("Corso non trovato");
+        }
 
-        validateCorso(corso);
+        Corso existingCorso = corso.get();
+        existingCorso.setNome(updatedCorso.getNome());
+        existingCorso.setAnno_accademico(updatedCorso.getAnno_accademico());
+        existingCorso.setId_docente(updatedCorso.getId_docente());
+        existingCorso.setId_dicente(updatedCorso.getId_dicente());
 
-        existing.setNome(corso.getNome());
-        existing.setAnno_accademico(corso.getAnno_accademico());
-
-        return corsoRepository.save(existing);
+        Corso updated = corsoRepository.save(existingCorso);
+        return corsoMapper.toDTO(updated);
     }
 
     @Transactional
@@ -142,7 +175,6 @@ public class CorsoService {
         return corsoRepository.findByNomeContainingIgnoreCase(nome);
     }
 
-    // Overload per validare anche CorsoDTO
     private void validateCorso(Corso corso) {
         if (corso.getNome() == null || corso.getNome().trim().isEmpty()) {
             throw new IllegalArgumentException("Il nome del corso non può essere vuoto");
@@ -166,4 +198,5 @@ public class CorsoService {
             throw new IllegalArgumentException("L'id del docente non può essere nullo");
         }
     }
+
 }
