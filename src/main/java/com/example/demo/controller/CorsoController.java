@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.Mapper.CorsoMapper;
 import com.example.demo.data.DTO.CorsoDTO;
+import com.example.demo.data.DTO.DiscenteDTO;
 import com.example.demo.service.CorsoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -47,6 +48,10 @@ public class CorsoController {
         }
     }
 
+    @GetMapping("/{id}/discenti")
+    public List<DiscenteDTO> getDiscentiByCorso(@PathVariable Long id) {
+        return corsoService.getDiscentiByCorso(id);
+    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCorso(@PathVariable Long id) {

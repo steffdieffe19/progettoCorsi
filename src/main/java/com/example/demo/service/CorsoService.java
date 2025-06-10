@@ -37,42 +37,51 @@ public class CorsoService {
         List<CorsoDTO> corsiDTO = new ArrayList<>();
 
         for (Corso corso : corsi) {
-            CorsoDTO dto = new CorsoDTO();
+            CorsoDTO dto = corsoMapper.toDTO(corso);
             dto.setId(corso.getId());
             dto.setNome(corso.getNome());
             dto.setAnno_accademico(corso.getAnno_accademico());
             dto.setId_docente(corso.getId_docente());
+            dto.setId_discente(corso.getId_discente());
 
-            try {
-                DocenteDTO docente = webClient.get()
-                        .uri("/api/docenti/{id}", corso.getId_docente())
-                        .retrieve()
-                        .bodyToMono(DocenteDTO.class)
-                        .block();
-
-                if (docente != null) {
-                    dto.setDocenteNome(docente.getNome());
-                    dto.setDocenteCognome(docente.getCognome());
-                    dto.setDocenteData_di_nascita(docente.getData_di_nascita());
+            List<Long> idDiscenti = corso.getId_discente();
+            List<String> discenteNome = new ArrayList<>();
+            List<String> discenteCognome = new ArrayList<>();
+            if (idDiscenti != null) {
+                for (Long discenteId : idDiscenti) {
+                    try {
+                        DiscenteDTO discente = webClient.get()
+                                .uri("/api/discenti/{id}", discenteId)
+                                .retrieve()
+                                .bodyToMono(DiscenteDTO.class)
+                                .block();
+                        if (discente != null) {
+                            discenteNome.add(discente.getNome());
+                            discenteCognome.add(discente.getCognome());
+                        }
+                    } catch (WebClientResponseException.NotFound e) {
+                        // discente non trovato
+                    }
                 }
-            } catch (WebClientResponseException.NotFound e) {
-                dto.setDocenteNome("Non trovato");
-                dto.setDocenteCognome("Non trovato");
             }
+            dto.setDiscenteNome(discenteNome);
+            dto.setDiscenteCognome(discenteCognome);
 
-            try {
-                DiscenteDTO discente = webClient.get()
-                        .uri("/api/discenti/{id}", corso.getId_dicente())
-                        .retrieve()
-                        .bodyToMono(DiscenteDTO.class)
-                        .block();
-                if (discente != null) {
-                    dto.setId_dicente(discente.getId());}
-                    dto.setDiscenteNome(discente.getNome());
-                    dto.setDiscenteCognome(discente.getCognome());
-            } catch (WebClientResponseException.NotFound e) {
-                dto.setDiscenteNome("Non trovato");
-                dto.setDiscenteCognome("Non trovato");
+            if (corso.getId_docente() != null) {
+                try {
+                    DocenteDTO docente = webClient.get()
+                            .uri("/api/docenti/{id}", corso.getId_docente())
+                            .retrieve()
+                            .bodyToMono(DocenteDTO.class)
+                            .block();
+                    if (docente != null) {
+                        dto.setDocenteNome(docente.getNome());
+                        dto.setDocenteCognome(docente.getCognome());
+                        dto.setDocenteData_di_nascita(docente.getData_di_nascita());
+                    }
+                } catch (WebClientResponseException.NotFound e) {
+                    // docente non trovato
+                }
             }
 
             corsiDTO.add(dto);
@@ -99,8 +108,9 @@ public class CorsoService {
         }
     }
 
-
+    @Transactional
     public CorsoDTO createCorso(CorsoDTO corsoDTO) {
+        // Gestione docente
         if (corsoDTO.getId_docente() != null) {
             try {
                 webClient.get()
@@ -108,30 +118,22 @@ public class CorsoService {
                         .retrieve()
                         .bodyToMono(DocenteDTO.class)
                         .block();
-
                 logger.info("Docente esistente trovato con ID: {}", corsoDTO.getId_docente());
-
             } catch (WebClientResponseException.NotFound e) {
                 logger.info("Docente non trovato, procedendo con la creazione...");
-
                 try {
                     DocenteDTO nuovoDocente = new DocenteDTO();
                     nuovoDocente.setId(corsoDTO.getId_docente());
                     nuovoDocente.setNome(corsoDTO.getDocenteNome());
                     nuovoDocente.setCognome(corsoDTO.getDocenteCognome());
                     nuovoDocente.setData_di_nascita(corsoDTO.getDocenteData_di_nascita());
-
-
                     DocenteDTO docenteCreato = webClient.post()
                             .uri("/api/docenti")
                             .bodyValue(nuovoDocente)
                             .retrieve()
                             .bodyToMono(DocenteDTO.class)
                             .block();
-
                     logger.info("Docente creato con successo: {}", docenteCreato);
-
-
                     corsoDTO.setId_docente(docenteCreato.getId());
                 } catch (Exception ex) {
                     logger.error("Errore durante la creazione del docente", ex);
@@ -139,10 +141,97 @@ public class CorsoService {
                 }
             }
         }
-        logger.info("Procedendo con la creazione del corso...");
+        // Gestione discenti
+        List<Long> id_discente = new ArrayList<>();
+        List<String> discenteNome = corsoDTO.getDiscenteNome();
+        List<String> discenteCognome = corsoDTO.getDiscenteCognome();
+        if (discenteNome != null && discenteCognome != null && discenteNome.size() == discenteCognome.size()) {
+            for (int i = 0; i < discenteNome.size(); i++) {
+                String nome = discenteNome.get(i);
+                String cognome = discenteCognome.get(i);
+                try {
+                    DiscenteDTO discente = webClient.get()
+                            .uri(uriBuilder -> uriBuilder
+                                    .path("/api/discenti")
+                                    .queryParam("nome", nome)
+                                    .queryParam("cognome", cognome)
+                                    .build())
+                            .retrieve()
+                            .bodyToMono(DiscenteDTO.class)
+                            .block();
+                    if (discente != null) {
+                        id_discente.add(discente.getId());
+                        continue;
+                    }
+                } catch (WebClientResponseException.NotFound e) {
+                    // discente non trovato
+                }
+                DiscenteDTO nuovoDiscente = new DiscenteDTO();
+                nuovoDiscente.setNome(nome);
+                nuovoDiscente.setCognome(cognome);
+                DiscenteDTO discenteCreato = webClient.post()
+                        .uri("/api/discenti")
+                        .bodyValue(nuovoDiscente)
+                        .retrieve()
+                        .bodyToMono(DiscenteDTO.class)
+                        .block();
+                if (discenteCreato != null) {
+                    id_discente.add(discenteCreato.getId());
+                }
+            }
+        }
         Corso corso = corsoMapper.toEntity(corsoDTO);
+        corso.setId_discente(id_discente);
         corso = corsoRepository.save(corso);
-        return corsoMapper.toDTO(corso);
+
+        // Popola manualmente i campi extra nel DTO
+        CorsoDTO dto = corsoMapper.toDTO(corso);
+        dto.setId(corso.getId());
+        dto.setNome(corso.getNome());
+        dto.setAnno_accademico(corso.getAnno_accademico());
+        dto.setId_docente(corso.getId_docente());
+        dto.setId_discente(corso.getId_discente());
+
+        // Popola i dati dei discenti
+        List<String> nomi = new ArrayList<>();
+        List<String> cognomi = new ArrayList<>();
+        for (Long discenteId : id_discente) {
+            try {
+                DiscenteDTO discente = webClient.get()
+                        .uri("/api/discenti/{id}", discenteId)
+                        .retrieve()
+                        .bodyToMono(DiscenteDTO.class)
+                        .block();
+                if (discente != null) {
+                    nomi.add(discente.getNome());
+                    cognomi.add(discente.getCognome());
+                }
+            } catch (WebClientResponseException.NotFound e) {
+                // discente non trovato
+            }
+        }
+        dto.setDiscenteNome(nomi);
+        dto.setDiscenteCognome(cognomi);
+
+        // Popola i dati del docente
+        if (corso.getId_docente() != null) {
+            try {
+                DocenteDTO docente = webClient.get()
+                        .uri("/api/docenti/{id}", corso.getId_docente())
+                        .retrieve()
+                        .bodyToMono(DocenteDTO.class)
+                        .block();
+                if (docente != null) {
+                    dto.setDocenteNome(docente.getNome());
+                    dto.setDocenteCognome(docente.getCognome());
+                    dto.setDocenteData_di_nascita(docente.getData_di_nascita());
+                }
+            } catch (WebClientResponseException.NotFound e) {
+                // docente non trovato
+            }
+        }
+
+        return dto;
     }
 
     @Transactional
@@ -151,22 +240,69 @@ public class CorsoService {
         if (!corso.isPresent()) {
             throw new RuntimeException("Corso non trovato");
         }
-
         Corso existingCorso = corso.get();
         existingCorso.setNome(updatedCorso.getNome());
         existingCorso.setAnno_accademico(updatedCorso.getAnno_accademico());
         existingCorso.setId_docente(updatedCorso.getId_docente());
-        existingCorso.setId_dicente(updatedCorso.getId_dicente());
-
+        existingCorso.setId_discente(updatedCorso.getId_discente());
         Corso updated = corsoRepository.save(existingCorso);
-        return corsoMapper.toDTO(updated);
+
+
+        CorsoDTO dto = corsoMapper.toDTO(updated);
+        dto.setId(updated.getId());
+        dto.setNome(updated.getNome());
+        dto.setAnno_accademico(updated.getAnno_accademico());
+        dto.setId_docente(updated.getId_docente());
+        dto.setId_discente(updated.getId_discente());
+
+        // Popola i dati dei discenti
+        List<String> nomi = new ArrayList<>();
+        List<String> cognomi = new ArrayList<>();
+        if (updated.getId_discente() != null) {
+            for (Long discenteId : updated.getId_discente()) {
+                try {
+                    DiscenteDTO discente = webClient.get()
+                            .uri("/api/discenti/{id}", discenteId)
+                            .retrieve()
+                            .bodyToMono(DiscenteDTO.class)
+                            .block();
+                    if (discente != null) {
+                        nomi.add(discente.getNome());
+                        cognomi.add(discente.getCognome());
+                    }
+                } catch (WebClientResponseException.NotFound e) {
+                    // discente non trovato
+                }
+            }
+        }
+        dto.setDiscenteNome(nomi);
+        dto.setDiscenteCognome(cognomi);
+
+        // Popola i dati del docente
+        if (updated.getId_docente() != null) {
+            try {
+                DocenteDTO docente = webClient.get()
+                        .uri("/api/docenti/{id}", updated.getId_docente())
+                        .retrieve()
+                        .bodyToMono(DocenteDTO.class)
+                        .block();
+                if (docente != null) {
+                    dto.setDocenteNome(docente.getNome());
+                    dto.setDocenteCognome(docente.getCognome());
+                    dto.setDocenteData_di_nascita(docente.getData_di_nascita());
+                }
+            } catch (WebClientResponseException.NotFound e) {
+                // docente non trovato
+            }
+        }
+
+        return dto;
     }
 
     @Transactional
     public void deleteCorso(Long id) {
         Corso corso = corsoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Corso non trovato con id: " + id));
-
         corsoRepository.delete(corso);
     }
 
@@ -198,5 +334,4 @@ public class CorsoService {
             throw new IllegalArgumentException("L'id del docente non può essere nullo");
         }
     }
-
 }

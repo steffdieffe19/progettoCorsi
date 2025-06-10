@@ -23,18 +23,18 @@ public class Corso {
     private Long id_docente;
 
    @Column
-   private Long id_dicente;
+   private List<Long> id_discente;
 
 
     //COSTRUTTORI
     public Corso() {
     }
 
-    public Corso(String nome, Integer anno_accademico, Long id_docente, Long id_dicente) {
+    public Corso(String nome, Integer anno_accademico, Long id_docente, List<Long> id_discente) {
         this.nome = nome;
         this.anno_accademico = anno_accademico;
         this.id_docente = id_docente;
-        this.id_dicente = id_dicente;
+        this.id_discente = id_discente;
     }
 
     public Long getId() {
@@ -65,7 +65,9 @@ public class Corso {
 
     public void setId_docente(Long id_docente) {this.id_docente = id_docente;}
 
-    public Long getId_dicente() {return id_dicente;}
+    public List<Long> getId_discente() {return id_discente;}
 
-    public void setId_dicente(Long id_dicente) {this.id_dicente = id_dicente;}
+    public void setId_discente(List<Long> id_discente) {this.id_discente = id_discente;}
+
+
 }

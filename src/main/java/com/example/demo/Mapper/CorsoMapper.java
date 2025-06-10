@@ -17,5 +17,4 @@ public interface CorsoMapper {
 
     CorsoDTO toDTO(Corso corso);
 
-    ;
 }
