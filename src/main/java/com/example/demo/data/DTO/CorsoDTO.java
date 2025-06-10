@@ -1,5 +1,9 @@
 package com.example.demo.data.DTO;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.util.Date;
+
 public class CorsoDTO {
     private Long id;
     private String nome;
@@ -8,16 +12,19 @@ public class CorsoDTO {
 
     private String docenteNome;
     private String docenteCognome;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Date docenteData_di_nascita;
 
     public CorsoDTO() {}
 
-    public CorsoDTO(Long id, String nome, Integer anno_accademico, Long id_docente, String docenteNome, String docenteCognome) {
+    public CorsoDTO(Long id, String nome, Integer anno_accademico, Long id_docente, String docenteNome, String docenteCognome, Date docenteData_di_nascita) {
         this.id = id;
         this.nome = nome;
         this.anno_accademico = anno_accademico;
         this.id_docente = id_docente;
         this.docenteNome = docenteNome;
         this.docenteCognome = docenteCognome;
+        this.docenteData_di_nascita = docenteData_di_nascita;
     }
 
     public Long getId() {
@@ -44,4 +51,7 @@ public class CorsoDTO {
     public void setDocenteNome(String docenteNome) {this.docenteNome = docenteNome;}
     public String getDocenteCognome() {return docenteCognome;}
     public void setDocenteCognome(String docenteCognome) {this.docenteCognome = docenteCognome;}
+    public Date getDocenteData_di_nascita() { return docenteData_di_nascita;}
+    public void setDocenteData_di_nascita(Date DocenteData_di_nascita) {this.docenteData_di_nascita = DocenteData_di_nascita;}
+
 }

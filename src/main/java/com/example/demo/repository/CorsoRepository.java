@@ -12,21 +12,8 @@ public interface CorsoRepository extends JpaRepository<Corso, Long> {
 
 
     @Query("SELECT c FROM Corso c ORDER BY c.nome")
-    List<Corso> findAllSortedByNome();
-
-//    @Query("SELECT c FROM Corso c JOIN FETCH c.docente")
-//    List<Corso> findAllWithDocente();
-//
-//    List<Corso> findByDocenteId(Long docenteId);
+    List<Corso> findAll();
 
     List<Corso> findByNomeContainingIgnoreCase(String nome);
-
-//    @Query("SELECT c FROM Corso c ")
-//    List<Corso> findByDocenteNomeAndCognome(
-//        @Param("nome") String nome,
-//        @Param("cognome") String cognome
-//    );
-
-    @Query("SELECT c FROM Corso c ")
-    List<Corso> findAllWithDetails();
+    
 }

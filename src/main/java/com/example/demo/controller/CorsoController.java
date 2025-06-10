@@ -13,7 +13,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/corsi")
-@CrossOrigin(origins = "*")
 public class CorsoController {
 
     private final CorsoService corsoService;
@@ -39,9 +38,9 @@ public class CorsoController {
     }
 
     @PostMapping
-    public ResponseEntity<CorsoDTO> createCorso(@RequestBody Corso corso) {
-        Corso saved = corsoService.createCorso(corso);
-        return ResponseEntity.ok(corsoMapper.toDTO(saved));
+    public ResponseEntity<CorsoDTO> createCorso(@RequestBody CorsoDTO dto) {
+        CorsoDTO saved = corsoService.createCorso(dto);
+        return ResponseEntity.ok(saved);
     }
 
     @PutMapping("/{id}")
