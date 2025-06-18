@@ -1,4 +1,4 @@
-package com.example.demo.repository;
+package com.example.demo.repository.corsi;
 
 import com.example.demo.data.entity.Corso;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,6 +14,5 @@ public interface CorsoRepository extends JpaRepository<Corso, Long> {
     @Query("SELECT c FROM Corso c ORDER BY c.nome")
     List<Corso> findAll();
 
-    List<Corso> findByNomeContainingIgnoreCase(String nome);
-    
+    Long findIdByNome(String nome);
 }
