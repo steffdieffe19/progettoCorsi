@@ -1,10 +1,6 @@
 package com.example.demo.data.DTO;
 
-import lombok.Getter;
-import lombok.Setter;
-
 public class DiscenteDTO {
-    // Getter e Setter
     private Long id;
     private String nome;
     private String cognome;
@@ -24,6 +20,7 @@ public class DiscenteDTO {
     public DiscenteDTO() {
     }
 
+    // Getter e Setter
     public Long getId() {
         return id;
     }

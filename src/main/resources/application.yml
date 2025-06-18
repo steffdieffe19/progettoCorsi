@@ -1,40 +1,5 @@
 spring:
   application:
     name: demo
-
-  datasource:
-    jdbcUrl: jdbc:postgresql://localhost:5432/database_corso
-    username: postgres
-    password: Tyson1209
-    driver-class-name: org.postgresql.Driver
-
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-    open-in-view: false
-
-server:
-  port: 8080
-
-discenti:
-  service:
-    url: http://localhost:8081
-
-docenti:
-  service:
-    url: http://localhost:8081
-
-auth:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/users
-    username: postgres
-    password: Tyson1209
-    driver-class-name: org.postgresql.Driver
-  jpa:
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+  profiles:
+    active: test

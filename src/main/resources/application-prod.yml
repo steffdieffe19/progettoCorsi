@@ -1,21 +1,36 @@
 spring:
+  application:
+    name: demo
+
+  server:
+    port: 8080
+    error:
+      whitelabel:
+        enabled: true
+    servlet:
+      jsp:
+        prefix: /WEB-INF/jsp/error-page
+        suffix: .jsp
+
+
   datasource:
-    url: jdbc:postgresql://localhost:5432/academy
+    url: jdbc:postgresql://localhost:5432/database_corso
     username: postgres
     password: Tyson1209
     driver-class-name: org.postgresql.Driver
+
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
     properties:
       hibernate:
-        format_sql: true
-    open-in-view: false
-  servlet:
-    multipart:
-      max-file-size: 10MB
-      max-request-size: 10MB
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
 
-server:
-  port: 8081
+custom:
+  message: "Profilo PROD"
+
+# Endpoints utili:
+# - http://localhost:8080/docenti/lista
+# - http://localhost:8080/discenti/lista
+# - http://localhost:8080/corso/lista

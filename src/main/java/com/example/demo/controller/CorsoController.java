@@ -1,56 +1,62 @@
 package com.example.demo.controller;
 
+import com.example.demo.Mapper.CorsoMapper;
 import com.example.demo.data.DTO.CorsoDTO;
+import com.example.demo.data.DTO.DiscenteDTO;
 import com.example.demo.service.CorsoService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/corsi")
+@RequestMapping("/api/corsi")
 public class CorsoController {
-
 
     private final CorsoService corsoService;
 
+    @Autowired
+    private CorsoMapper corsoMapper;
+
+    @Autowired
     public CorsoController(CorsoService corsoService) {
         this.corsoService = corsoService;
     }
 
-
-    @GetMapping("/list")
-    public List<CorsoDTO> list() {
-        return corsoService.findAll();
+    @GetMapping
+    public List<CorsoDTO> getAllCorsi() {
+        return corsoService.getAllCorsi();
     }
 
     @PostMapping
-    public ResponseEntity<?> salvaCorso(@RequestBody CorsoDTO corsoDTO) {
+    public ResponseEntity<CorsoDTO> createCorso(@RequestBody CorsoDTO dto) {
+        CorsoDTO saved = corsoService.createCorso(dto);
+        return ResponseEntity.ok(saved);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<CorsoDTO> updateCorso(@PathVariable Long id, @RequestBody CorsoDTO updatedCorso) {
         try {
-            CorsoDTO saved = corsoService.save(corsoDTO);
-            return ResponseEntity.ok(saved);
+            CorsoDTO updated = corsoService.updateCorso(id, updatedCorso);
+            return ResponseEntity.ok(updated);
         } catch (RuntimeException e) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(e.getMessage());
+            if (e.getMessage().contains("non trovato")) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.internalServerError().build();
         }
     }
 
-
-    @PutMapping("/{id}")
-    public ResponseEntity<?> modificaCorso(@PathVariable Long id, @RequestBody CorsoDTO corso) {
-        try {
-            CorsoDTO corsoAggiornato = corsoService.updateCorso(id, corso);
-            return ResponseEntity.ok(corsoAggiornato);
-        } catch (RuntimeException e) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(e.getMessage());
-        }
+    @GetMapping("/{id}/discenti")
+    public List<DiscenteDTO> getDiscentiByCorso(@PathVariable Long id) {
+        return corsoService.getDiscentiByCorso(id);
     }
 
     @DeleteMapping("/{id}")
-    public void eliminaCorso(@PathVariable Long id) {
-        corsoService.deleteById(id);
+    public ResponseEntity<Void> deleteCorso(@PathVariable Long id) {
+        corsoService.deleteCorso(id);
+        return ResponseEntity.noContent().build();
     }
+
 }

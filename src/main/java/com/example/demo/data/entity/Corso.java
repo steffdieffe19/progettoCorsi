@@ -1,44 +1,40 @@
 package com.example.demo.data.entity;
 
+import com.example.demo.data.DTO.DiscenteDTO;
 import jakarta.persistence.*;
-import lombok.*;
 
-
+import java.util.List;
 
 @Entity
-@NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "corso")
-public class Corso {
 
+public class Corso {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String nome;
 
-    @Column(name = "anno_accademico")
-    private String annoAccademico;
+    @Column(nullable = false)
+    private Integer anno_accademico;
 
-    @Column(name = "DocenteId")
-    private Long docenteId;
+    @Column
+    private Long id_docente;
+
+   @Column
+   private List<Long> id_discente;
 
 
-
-    public String getAnnoAccademico() {
-        return annoAccademico;
+    //COSTRUTTORI
+    public Corso() {
     }
 
-    public void setAnnoAccademico(String annoAccademico) {
-        this.annoAccademico = annoAccademico;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
+    public Corso(String nome, Integer anno_accademico, Long id_docente, List<Long> id_discente) {
         this.nome = nome;
+        this.anno_accademico = anno_accademico;
+        this.id_docente = id_docente;
+        this.id_discente = id_discente;
     }
 
     public Long getId() {
@@ -49,11 +45,29 @@ public class Corso {
         this.id = id;
     }
 
-    public Long getDocenteId() {
-        return docenteId;
+    public String getNome() {
+        return nome;
     }
 
-    public void setDocenteId(Long docenteId) {
-        this.docenteId = docenteId;
+    public void setNome(String nome) {
+        this.nome = nome;
     }
+
+    public Integer getAnno_accademico() {
+        return anno_accademico;
+    }
+
+    public void setAnno_accademico(Integer anno_accademico) {
+        this.anno_accademico = anno_accademico;
+    }
+
+    public Long getId_docente() {return id_docente;}
+
+    public void setId_docente(Long id_docente) {this.id_docente = id_docente;}
+
+    public List<Long> getId_discente() {return id_discente;}
+
+    public void setId_discente(List<Long> id_discente) {this.id_discente = id_discente;}
+
+
 }
