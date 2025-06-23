@@ -8,14 +8,14 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Configuration
 public class WebClientConfig {
 
-    @Bean(name = "discenteWebClient")
+    @Bean
     public WebClient discenteWebClient(@Value("${discenti.service.url}") String baseUrl) {
         return WebClient.builder()
                 .baseUrl(baseUrl)
                 .build();
     }
 
-    @Bean(name = "docenteWebClient")
+    @Bean
     public WebClient docenteWebClient(@Value("${docenti.service.url}") String baseUrl) {
         return WebClient.builder()
                 .baseUrl(baseUrl)

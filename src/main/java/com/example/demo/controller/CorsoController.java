@@ -11,31 +11,26 @@ import java.util.List;
 @RequestMapping("/corsi")
 public class CorsoController {
 
-
     private final CorsoService corsoService;
 
     public CorsoController(CorsoService corsoService) {
         this.corsoService = corsoService;
     }
 
-
     @GetMapping("/list")
     public List<CorsoDTO> list() {
         return corsoService.findAll();
     }
 
-    @PostMapping
+    @PostMapping ("/new")
     public ResponseEntity<?> salvaCorso(@RequestBody CorsoDTO corsoDTO) {
         try {
             CorsoDTO saved = corsoService.save(corsoDTO);
             return ResponseEntity.ok(saved);
         } catch (RuntimeException e) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-
 
     @PutMapping("/{id}")
     public ResponseEntity<?> modificaCorso(@PathVariable Long id, @RequestBody CorsoDTO corso) {
@@ -43,14 +38,13 @@ public class CorsoController {
             CorsoDTO corsoAggiornato = corsoService.updateCorso(id, corso);
             return ResponseEntity.ok(corsoAggiornato);
         } catch (RuntimeException e) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
     @DeleteMapping("/{id}")
-    public void eliminaCorso(@PathVariable Long id) {
+    public ResponseEntity<Void> eliminaCorso(@PathVariable Long id) {
         corsoService.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }

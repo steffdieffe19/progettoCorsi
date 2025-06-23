@@ -1,6 +1,6 @@
 spring:
-  application:
-    name: demo
+  profiles:
+    active: dev
 
   datasource:
     jdbcUrl: jdbc:postgresql://localhost:5432/database_corso
@@ -38,3 +38,7 @@ auth:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+
+jwt:
+  secret: mySecretKeyForJWTTokenGenerationThatShouldBeAtLeast256BitsLong
+  expiration: 86400000 # 24 ore in millisecondi

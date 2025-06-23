@@ -1,15 +1,14 @@
 package com.example.demo.service;
 
-import com.example.demo.Mapper.CorsoMapper;
+import com.example.demo.converter.CorsoMapper;
 import com.example.demo.data.DTO.CorsoDTO;
 import com.example.demo.data.DTO.DiscenteDTO;
 import com.example.demo.data.DTO.DocenteDTO;
 import com.example.demo.data.entity.Corso;
 import com.example.demo.data.entity.CorsoDiscenti;
-import com.example.demo.repository.corsi.CorsoDiscentiRepo;
-import com.example.demo.repository.corsi.CorsoRepository;
+import com.example.demo.repository.CorsoDiscentiRepo;
+import com.example.demo.repository.CorsoRepository;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

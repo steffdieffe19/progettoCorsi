@@ -1,4 +1,7 @@
 spring:
+  application:
+    name: demo
+
   datasource:
     url: jdbc:postgresql://localhost:5432/database_corso
     username: postgres
@@ -29,10 +32,14 @@ auth:
 server:
   port: 8080
 
-discenti:
-  service:
-    url: http://localhost:8081
+#discenti:
+#  service:
+#    url: http://localhost:8081
+#
+#docenti:
+#  service:
+#    url: http://localhost:8081
 
-docenti:
-  service:
-    url: http://localhost:8081
+jwt:
+  secret: mySecretKeyForJWTTokenGenerationThatShouldBeAtLeast256BitsLong
+  expiration: 86400000 # 24 ore in millisecondi
